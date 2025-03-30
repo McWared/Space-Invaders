@@ -1,0 +1,9 @@
+# Environment files
+.vscode
+__pycache__
+
+# Test files
+test*
+
+# Legacy files
+old.py
