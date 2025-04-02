@@ -10,7 +10,7 @@ class Laser:
         self.img = img
         self.mask = pygame.mask.from_surface(self.img)
 
-    def draw(self, window):
+    def draw(self, window: pygame.Surface):
         window.blit(self.img, (self.x, self.y))
 
     def move(self, vel):
