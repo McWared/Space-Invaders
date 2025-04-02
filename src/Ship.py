@@ -96,9 +96,8 @@ class Player(Ship):
         self.draw_healthbar(window)
 
     def draw_healthbar(self, window) -> None:
-        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
-        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
-
+        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10)) # (x, y, length, width)
+        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10)) # (x, y, length, width)
 
 class Enemy(Ship):
     COLOR_MAP = {
@@ -121,6 +120,7 @@ class Enemy(Ship):
     def draw_healthbar(self, window) -> None:
         pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
         pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
+        pygame.draw.rect(window, (0,0,0), (self.x + self.ship_img.get_width() / 2, self.y + self.ship_img.get_height() + 10, 1, 10)) # (x, y, length, width)
 
     def move(self, vel) -> None:
         self.y += vel
