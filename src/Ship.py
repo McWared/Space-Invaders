@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 import pygame
 
@@ -68,7 +69,7 @@ class Ship:
 
 class Player(Ship):
     def __init__(self, x: int, y: int, health = 100, damage = 50) -> None:
-        Ship.__init__(self, x, y, health)
+        Ship.__init__(self, x, y)
         self.max_health = health
         self.damage = damage
         self.ship_img: pygame.Surface = YELLOW_SPACE_SHIP
@@ -96,21 +97,33 @@ class Player(Ship):
         self.draw_healthbar(window)
 
     def draw_healthbar(self, window) -> None:
-        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10)) # (x, y, length, width)
-        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10)) # (x, y, length, width)
+        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10)) # red part
+        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10)) # green part
 
 class Enemy(Ship):
     COLOR_MAP = {
-                "red": (RED_SPACE_SHIP, RED_LASER),
-                "green": (GREEN_SPACE_SHIP, GREEN_LASER),
-                "blue": (BLUE_SPACE_SHIP, BLUE_LASER)
+        "red": (RED_SPACE_SHIP, RED_LASER),
+        "green": (GREEN_SPACE_SHIP, GREEN_LASER),
+        "blue": (BLUE_SPACE_SHIP, BLUE_LASER)
+    }
+    HEALTH_MAP = {
+        "red": 100,
+        "green": 100,
+        "blue": 50 
+    }
+    DAMAGE_MAP = {
+        "red": 20,
+        "green": 20,
+        "blue": 10
     }
 
-    def __init__(self, x, y, color, health = 100, damage: int = 10) -> None:
-        Ship.__init__(self, x, y, health)
-        self.damage = damage
-        self.max_health = health
-        self.ship_img, self.laser_img = self.COLOR_MAP[color]
+    def __init__(self, x, y, color: Literal['red', 'green', 'blue']) -> None:
+        Ship.__init__(self, x, y)
+        self.color = color
+        self.health = Enemy.HEALTH_MAP[color]
+        self.max_health = Enemy.HEALTH_MAP[color]
+        self.damage = Enemy.DAMAGE_MAP[color]
+        self.ship_img, self.laser_img = Enemy.COLOR_MAP[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
 
     def draw_entity(self, window) -> None:
@@ -118,9 +131,10 @@ class Enemy(Ship):
         self.draw_healthbar(window)
 
     def draw_healthbar(self, window) -> None:
-        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
-        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
-        pygame.draw.rect(window, (0,0,0), (self.x + self.ship_img.get_width() / 2, self.y + self.ship_img.get_height() + 10, 1, 10)) # (x, y, length, width)
+        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10)) # red part
+        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10)) # green part
+        if self.max_health == 100:
+            pygame.draw.rect(window, (0,0,0), (self.x + self.ship_img.get_width() / 2, self.y + self.ship_img.get_height() + 10, 1, 10)) # black half-divisor
 
     def move(self, vel) -> None:
         self.y += vel
@@ -131,12 +145,12 @@ class Enemy(Ship):
             self.lasers.append(laser)
             self.cool_down_counter = 1
 
-    def move_lasers(self, vel: int, obj: Player) -> None:
+    def move_lasers(self, vel: int, player: Player) -> None:
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
             if laser.off_screen(HEIGHT):
                 self.lasers.remove(laser)
-            elif laser.collision(obj):
-                obj.health -= self.damage
+            elif laser.collision(player):
+                player.health -= self.damage
                 self.lasers.remove(laser)
