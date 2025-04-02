@@ -23,60 +23,60 @@ YELLOW_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_yellow.png"
 class Ship:
     COOLDOWN = 30
 
-    def __init__(self, x, y, health=100):
+    def __init__(self, x: int, y: int, health = 100) -> None:
         self.x = x
         self.y = y
         self.health = health
-        self.ship_img = None
-        self.laser_img = None
-        self.lasers = []
+        self.ship_img: pygame.Surface = None
+        self.laser_img: pygame.Surface = None
+        self.lasers: list[Laser] = []
         self.cool_down_counter = 0
 
-    def draw(self, window):
+    def draw_entity(self, window: pygame.Surface) -> None:
         window.blit(self.ship_img, (self.x, self.y))
         for laser in self.lasers:
             laser.draw(window)
 
-    def move_lasers(self, vel, obj):
-        self.cooldown()
-        for laser in self.lasers:
-            laser.move(vel)
-            if laser.off_screen(HEIGHT):
-                self.lasers.remove(laser)
-            elif laser.collision(obj):
-                obj.health -= 10
-                self.lasers.remove(laser)
+    # Abstract method
+    def move_lasers(self, vel: int, objs) -> None:
+        raise NotImplementedError("Please Implement this method")
+    
+    # Abstract method
+    def draw_healthbar(self, window: pygame.Surface) -> None:
+        raise NotImplementedError("Please Implement this method")
 
-    def cooldown(self):
+    def cooldown(self) -> None:
         if self.cool_down_counter >= self.COOLDOWN:
             self.cool_down_counter = 0
         elif self.cool_down_counter > 0:
             self.cool_down_counter += 1
 
-    def shoot(self):
+    def shoot(self) -> None:
         if self.cool_down_counter == 0:
             laser = Laser(self.x, self.y, self.laser_img)
             self.lasers.append(laser)
             self.cool_down_counter = 1
 
     @property
-    def width(self):
+    def width(self) -> None:
         return self.ship_img.get_width()
 
     @property
-    def height(self):
+    def height(self) -> None:
         return self.ship_img.get_height()
     
 
 class Player(Ship):
-    def __init__(self, x, y, health=100):
-        super().__init__(x, y, health)
-        self.ship_img = YELLOW_SPACE_SHIP
-        self.laser_img = YELLOW_LASER
-        self.mask = pygame.mask.from_surface(self.ship_img)
+    def __init__(self, x: int, y: int, health = 100, damage = 50) -> None:
+        Ship.__init__(self, x, y, health)
         self.max_health = health
+        self.damage = damage
+        self.ship_img: pygame.Surface = YELLOW_SPACE_SHIP
+        self.laser_img: pygame.Surface = YELLOW_LASER
+        self.mask: pygame.Mask = pygame.mask.from_surface(self.ship_img)
 
-    def move_lasers(self, vel, objs):
+
+    def move_lasers(self, vel: int, objs: list[Ship]) -> None: # TODO: move class Enemy(Ship) to another file -> able to write list[Enemy]
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
@@ -85,15 +85,17 @@ class Player(Ship):
             else:
                 for obj in objs:
                     if laser.collision(obj):
-                        objs.remove(obj)
-                        if laser in self.lasers:
+                        obj.health -= self.damage
+                        if obj.health == 0:
+                            objs.remove(obj)
+                        if laser in self.lasers: # Anti-bug IF
                             self.lasers.remove(laser)
 
-    def draw(self, window):
-        super().draw(window)
-        self.healthbar(window)
+    def draw_entity(self, window) -> None:
+        Ship.draw_entity(self, window)
+        self.draw_healthbar(window)
 
-    def healthbar(self, window):
+    def draw_healthbar(self, window) -> None:
         pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
         pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
 
@@ -105,16 +107,36 @@ class Enemy(Ship):
                 "blue": (BLUE_SPACE_SHIP, BLUE_LASER)
     }
 
-    def __init__(self, x, y, color, health=100):
-        super().__init__(x, y, health)
+    def __init__(self, x, y, color, health = 100, damage: int = 10) -> None:
+        Ship.__init__(self, x, y, health)
+        self.damage = damage
+        self.max_health = health
         self.ship_img, self.laser_img = self.COLOR_MAP[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
 
-    def move(self, vel):
+    def draw_entity(self, window) -> None:
+        Ship.draw_entity(self, window)
+        self.draw_healthbar(window)
+
+    def draw_healthbar(self, window) -> None:
+        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width(), 10))
+        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.ship_img.get_height() + 10, self.ship_img.get_width() * (self.health/self.max_health), 10))
+
+    def move(self, vel) -> None:
         self.y += vel
 
-    def shoot(self):
+    def shoot(self) -> None:
         if self.cool_down_counter == 0:
             laser = Laser(self.x-20, self.y, self.laser_img)
             self.lasers.append(laser)
             self.cool_down_counter = 1
+
+    def move_lasers(self, vel: int, obj: Player) -> None:
+        self.cooldown()
+        for laser in self.lasers:
+            laser.move(vel)
+            if laser.off_screen(HEIGHT):
+                self.lasers.remove(laser)
+            elif laser.collision(obj):
+                obj.health -= self.damage
+                self.lasers.remove(laser)
