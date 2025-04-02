@@ -48,9 +48,9 @@ class Game:
         self.WIN.blit(level_label, (self.WIDTH - level_label.get_width() - 10, 10))
 
         for enemy in self.ENEMIES:
-            enemy.draw(self.WIN)
+            enemy.draw_entity(self.WIN)
 
-        self.PLAYER.draw(self.WIN)
+        self.PLAYER.draw_entity(self.WIN)
 
         if self.LOST:
             lost_label = self.lost_font.render("You Lost!!", 1, (255,255,255))
