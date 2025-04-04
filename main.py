@@ -4,6 +4,7 @@ import src.cfg as cfg
 def main_menu():
     WIDTH, HEIGHT = cfg.WIDTH, cfg.HEIGHT
     WIN: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Space Invaders")
 
     title_font = pygame.font.SysFont("comicsans", 60)
 

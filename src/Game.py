@@ -22,7 +22,6 @@ class Game:
 
         # Background
         self.BG: pygame.Surface = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
-        pygame.display.set_caption("Space Invaders")
 
         # Game
         self.LIVES = 5
