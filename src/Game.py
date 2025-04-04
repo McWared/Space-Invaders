@@ -9,16 +9,19 @@ from .Ship import Enemy, Player
 pygame.font.init()
 
 class Game:
-    def __init__(self, WIDTH: int = 750, HEIGHT: int = 750) -> None:
+    # FPS of the Game
+    FPS = 60
+
+    def __init__(self, WIN: pygame.Surface, WIDTH: int, HEIGHT: int) -> None:
         # Window
-        self.WIDTH, self.HEIGHT = 750, 750
-        self.WIN: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
-        self.FPS = 60
-        pygame.display.set_caption("Space Invaders")
+        self.WIN = WIN
+        self.WIDTH = WIDTH
+        self.HEIGHT = HEIGHT
 
         # Background
         self.BG: pygame.Surface = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
-        
+        pygame.display.set_caption("Space Invaders")
+
         # Game
         self.LIVES = 5
         self.LEVEL = 0
@@ -52,10 +55,11 @@ class Game:
 
         self.PLAYER.draw_entity(self.WIN)
 
-        if self.LOST:
-            lost_label = self.lost_font.render("You Lost!!", 1, (255,255,255))
-            self.WIN.blit(lost_label, (self.WIDTH/2 - lost_label.get_width()/2, 350))
+        pygame.display.update()
 
+    def lost_message_render(self) -> None:
+        lost_label = self.lost_font.render("You Lost!!", 1, (255,255,255))
+        self.WIN.blit(lost_label, (self.WIDTH/2 - lost_label.get_width()/2, 350))
         pygame.display.update()
 
     def run_game(self) -> None:
@@ -75,6 +79,7 @@ class Game:
                 if self.LOST_COUNT > self.FPS * 3:
                     self.RUN = False
                 else:
+                    self.lost_message_render()
                     continue # If LOST we don't need to do actions below
 
             if len(self.ENEMIES) == 0:
