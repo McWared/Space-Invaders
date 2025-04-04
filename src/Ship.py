@@ -13,7 +13,7 @@ GREEN_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_green_sm
 BLUE_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_blue_small.png"))
 
 # Player's ship
-YELLOW_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_yellow.png"))
+YELLOW_SPACE_SHIP = pygame.transform.scale(pygame.image.load(os.path.join("assets", "player.png")), (100, 90))
 
 # Lasers
 RED_LASER = pygame.image.load(os.path.join("assets", "pixel_laser_red.png"))
@@ -54,7 +54,7 @@ class Ship:
 
     def shoot(self) -> None:
         if self.cool_down_counter == 0:
-            laser = Laser(self.x, self.y, self.laser_img)
+            laser = Laser(self.x + self.ship_img.get_width() / 2, self.y, self.laser_img)
             self.lasers.append(laser)
             self.cool_down_counter = 1
 
@@ -141,7 +141,7 @@ class Enemy(Ship):
 
     def shoot(self) -> None:
         if self.cool_down_counter == 0:
-            laser = Laser(self.x-20, self.y, self.laser_img)
+            laser = Laser(self.x + self.ship_img.get_width() // 2, self.y, self.laser_img)
             self.lasers.append(laser)
             self.cool_down_counter = 1
 
