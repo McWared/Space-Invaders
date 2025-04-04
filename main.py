@@ -2,18 +2,22 @@ from src.Game import *
 
 
 def main_menu():
+    WIDTH, HEIGHT = 750, 750
+    WIN: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
+
     title_font = pygame.font.SysFont("comicsans", 60)
-    game = Game()
+
     run = True
     while run:
         title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
-        game.WIN.blit(title_label, (game.WIDTH/2 - title_label.get_width()/2, 350))
+        WIN.blit(title_label, (WIDTH/2 - title_label.get_width()/2, 350))
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                game = Game(WIN, WIDTH, HEIGHT)
                 game.run_game()
                 
     pygame.quit()
