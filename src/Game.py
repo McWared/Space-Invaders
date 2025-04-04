@@ -3,6 +3,8 @@ import random
 
 import pygame
 
+from . import cfg
+
 from .collide import collide
 from .Ship import Enemy, Player
 
@@ -10,7 +12,7 @@ pygame.font.init()
 
 class Game:
     # FPS of the Game
-    FPS = 60
+    FPS = cfg.FPS
 
     def __init__(self, WIN: pygame.Surface, WIDTH: int, HEIGHT: int) -> None:
         # Window

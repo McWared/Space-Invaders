@@ -1,8 +1,8 @@
 from src.Game import *
-
+import src.cfg as cfg
 
 def main_menu():
-    WIDTH, HEIGHT = 750, 750
+    WIDTH, HEIGHT = cfg.WIDTH, cfg.HEIGHT
     WIN: pygame.Surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
     title_font = pygame.font.SysFont("comicsans", 60)
@@ -10,7 +10,7 @@ def main_menu():
     run = True
     while run:
         title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
-        WIN.blit(title_label, (WIDTH/2 - title_label.get_width()/2, 350))
+        WIN.blit(title_label, (WIDTH / 2 - title_label.get_width()/2, 350))
         pygame.display.update()
 
         for event in pygame.event.get():

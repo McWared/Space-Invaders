@@ -3,9 +3,9 @@ from typing import Literal
 
 import pygame
 
-from .Laser import Laser
+from . import cfg
 
-WIDTH, HEIGHT = 750, 750
+from .Laser import Laser
 
 # Load images
 RED_SPACE_SHIP = pygame.image.load(os.path.join("assets", "pixel_ship_red_small.png"))
@@ -81,7 +81,7 @@ class Player(Ship):
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
-            if laser.off_screen(HEIGHT):
+            if laser.off_screen(cfg.HEIGHT):
                 self.lasers.remove(laser)
             else:
                 for obj in objs:
@@ -149,7 +149,7 @@ class Enemy(Ship):
         self.cooldown()
         for laser in self.lasers:
             laser.move(vel)
-            if laser.off_screen(HEIGHT):
+            if laser.off_screen(cfg.HEIGHT):
                 self.lasers.remove(laser)
             elif laser.collision(player):
                 player.health -= self.damage
